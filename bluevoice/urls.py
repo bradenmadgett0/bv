@@ -16,19 +16,54 @@ Including another URLconf
 """
 # from django.contrib import admin
 from django.urls import path, include
-from rest_framework import routers
 from rest_framework.urlpatterns import format_suffix_patterns
+from rest_framework.routers import DefaultRouter
 from . import views
 
-router = routers.DefaultRouter()
+menu_item_list = views.MenuItemsViewSet.as_view({
+    'get': 'list',
+    'post': 'create'
+})
+
+menu_item_detail = views.MenuItemsViewSet.as_view({
+    'get': 'retrieve',
+    'put': 'update',
+    'patch': 'partial_update',
+    'delete': 'destroy'
+})
+
+cart_list = views.CartViewSet.as_view({
+    'get': 'list',
+    'post': 'create',
+})
+
+cart_detail = views.CartViewSet.as_view({
+    'get': 'retrieve',
+    'put': 'update',
+    'patch': 'partial_update',
+    'delete': 'destroy'
+})
+
+user_list = views.UserViewSet.as_view({
+    'get': 'list',
+    'post': 'create_user'
+})
+
+user_detail = views.UserViewSet.as_view({
+    'get': 'retrieve'
+})
+
+router = DefaultRouter()
 router.register(r'users', views.UserViewSet)
+router.register(r'api/menu', views.MenuItemsViewSet)
+router.register(r'api/cart', views.CartViewSet)
 
 urlpatterns = [
-    # path('admin/', admin.site.urls),
-    # path('', include(router.urls)),
-    path('menu_items/', views.MenuItemsList.as_view()),
-    path('menu_items/<int:pk>/', views.MenuItemDetail.as_view()),
-    path('api-auth/', include('rest_framework.urls'))
+    path('', include(router.urls)),
 ]
 
-urlpatterns = format_suffix_patterns(urlpatterns)
+# urlpatterns = format_suffix_patterns(urlpatterns)
+
+urlpatterns += [
+    path('api/login/', include('rest_framework.urls')),
+]

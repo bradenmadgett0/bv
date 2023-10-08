@@ -1,22 +1,34 @@
 from django.contrib.auth.models import User
-from rest_framework import viewsets, permissions, generics
+from django.http import HttpResponseNotFound
+from rest_framework import viewsets, permissions, serializers as rest_serializers, status
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework.reverse import reverse
 
 from . import serializers
 from . import models
 
-
 class UserViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows users to be viewed or edited.
-    """
-    queryset = User.objects.all().order_by('-date_joined')
+    queryset = User.objects.all()
     serializer_class = serializers.UserSerializer
+
+class MenuItemsViewSet(viewsets.ModelViewSet):
+    queryset = models.MenuItem.objects.all()
+    serializer_class = serializers.MenuItemSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+    def get_serializer_context(self):
+        return {'request': self.request}
+
+class CartViewSet(viewsets.ModelViewSet):
+    queryset = models.Cart.objects.all()
+    serializer_class = serializers.CartSerializer
     permission_classes = [permissions.IsAuthenticated]
 
-class MenuItemsList(generics.ListCreateAPIView): 
-    queryset = models.MenuItem.objects.all()
-    serializer_class = serializers.MenuItemSerializer
-
-class MenuItemDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = models.MenuItem.objects.all()
-    serializer_class = serializers.MenuItemSerializer
+    def list(self, request):
+        try:
+            cart = models.Cart.objects.get(owner=request.user.id)
+        except models.Cart.DoesNotExist:
+            return HttpResponseNotFound()
+        serializer = serializers.CartSerializer(cart, many=False)
+        return Response(serializer.data)
