@@ -9,8 +9,14 @@ class MenuItem(models.Model):
 class Cart(models.Model):
     owner = models.OneToOneField(User, related_name='cart', on_delete=models.CASCADE, null=True)
     items = models.ManyToManyField(MenuItem, through='CartItem')
+    total = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 
 class CartItem(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
     item = models.ForeignKey(MenuItem, on_delete=models.CASCADE)
     quantity = models.IntegerField(default=1)
+
+class Order(models.Model):
+    owner = models.OneToOneField(User, related_name='order', on_delete=models.CASCADE, null=True)
+    items = models.ManyToManyField(CartItem)
+    total = models.DecimalField(max_digits=10, decimal_places=2)

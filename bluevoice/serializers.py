@@ -12,8 +12,15 @@ class MenuItemSerializer(serializers.ModelSerializer):
 
     def get_quantity(self, obj):
         request = self.context['request']
-        cart = request.user.cart
-        return obj.cartitem_set.filter(cart=cart).first().quantity
+        try:
+            cart = request.user.cart
+        except:
+            return None
+        cart_item = obj.cartitem_set.filter(cart=cart).first()
+        if cart_item:
+            return cart_item.quantity
+        else:
+            return None
 
     def create(self, validated_data):
          return models.MenuItem.objects.create(**validated_data)
@@ -28,13 +35,13 @@ class MenuItemSerializer(serializers.ModelSerializer):
 class CartItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.CartItem
-        fields = ['title', 'quantity']
+        fields = ['title', 'quantity', 'item']
 
 class CartSerializer(serializers.ModelSerializer):
     items = MenuItemSerializer(many = True, read_only=True)
     class Meta:
         model = models.Cart
-        fields = ['items', 'id', 'owner']
+        fields = ['items', 'id', 'owner', 'total']
 
     def create(self, validated_data):
         request = self.context.get('request', None)
@@ -55,12 +62,14 @@ class CartSerializer(serializers.ModelSerializer):
                 cart_item.save()
             except models.CartItem.DoesNotExist:
                 cart.items.add(item_to_add)
+            cart.total = cart.total + item_to_add.price
             cart.save()
             return cart
         except models.Cart.DoesNotExist:
             new_cart = models.Cart.objects.create(owner=request.user)
             item_to_add.count = 1
             new_cart.items.add(item_to_add)
+            new_cart.total = item_to_add.price
             new_cart.save()
             return new_cart
         
@@ -81,8 +90,11 @@ class CartSerializer(serializers.ModelSerializer):
         
         try:
             cart_item = models.CartItem.objects.get(cart=instance, item=item_to_update)
+            price_diff = (quantity - cart_item.quantity) * item_to_update.price
             cart_item.quantity = quantity
             cart_item.save()
+            instance.total += price_diff
+            instance.save()
         except models.CartItem.DoesNotExist:
             return HttpResponseNotFound()
         return instance
