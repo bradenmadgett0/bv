@@ -1,0 +1,47 @@
+[
+    {
+        "model": "bluevoice.menuitem",
+        "pk": 1,
+        "fields": {
+            "title": "Gyoza",
+            "description": "Dumplings filled with your choice of chicken, beef, or shrimp.",
+            "price": "6.99"
+        }
+    },
+    {
+        "model": "bluevoice.menuitem",
+        "pk": 2,
+        "fields": {
+            "title": "Krab Rangoon",
+            "description": "Crispy wonton filled with cream cheese and imitation crab.",
+            "price": "4.99"
+        }
+    },
+    {
+        "model": "bluevoice.menuitem",
+        "pk": 3,
+        "fields": {
+            "title": "Kung Pao Chicken",
+            "description": "Dark meat chicken tossed in a spicy sauce.",
+            "price": "12.99"
+        }
+    },
+    {
+        "model": "bluevoice.menuitem",
+        "pk": 3,
+        "fields": {
+            "title": "General Tso's Chicken",
+            "description": "Crisply fried chicken tossed in a sweet and savory sauce.",
+            "price": "10.99"
+        }
+    },
+    {
+        "model": "bluevoice.menuitem",
+        "pk": 4,
+        "fields": {
+            "title": "Spring Rolls",
+            "description": "Crispy roll filled with vegetables.",
+            "price": "5.99"
+        }
+    }
+]

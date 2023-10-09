@@ -75,8 +75,6 @@ urlpatterns = [
     path('', include(router.urls)),
 ]
 
-# urlpatterns = format_suffix_patterns(urlpatterns)
-
 urlpatterns += [
-    path('api/login/', include('rest_framework.urls')),
+    path('api/', include('rest_framework.urls')),
 ]
