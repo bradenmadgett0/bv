@@ -95,7 +95,7 @@ class OrderSerializer(serializers.ModelSerializer):
     cart = CartSerializer(many = False, read_only=True)
     class Meta:
         model = models.Order
-        fields = ['owner', 'cart']
+        fields = ['owner', 'cart', 'id']
     
     def create(self, validated_data):
         request = self.context.get('request', None)
