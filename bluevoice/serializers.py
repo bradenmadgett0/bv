@@ -107,4 +107,5 @@ class OrderSerializer(serializers.ModelSerializer):
         current_cart.owner = None
         current_cart.save()
         new_order = models.Order.objects.create(owner=request.user, cart=current_cart)
+        models.Cart.objects.create(owner=request.user)
         return new_order
