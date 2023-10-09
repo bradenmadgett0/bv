@@ -7,7 +7,7 @@ class MenuItem(models.Model):
     price = models.DecimalField(max_digits=6, decimal_places=2)
 
 class Cart(models.Model):
-    owner = models.OneToOneField(User, related_name='cart', on_delete=models.CASCADE, null=True)
+    owner = models.OneToOneField(User, related_name='cart', on_delete=models.CASCADE, null=True, blank=True)
     total = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     order_created = models.BooleanField(default = False)
 

@@ -92,7 +92,7 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ['username', 'email', 'id', 'cart']
 
 class OrderSerializer(serializers.ModelSerializer):
-    # cart = MenuItemSerializer(many = True, read_only=True)
+    cart = CartSerializer(many = False, read_only=True)
     class Meta:
         model = models.Order
         fields = ['owner', 'cart']
@@ -104,6 +104,7 @@ class OrderSerializer(serializers.ModelSerializer):
         except models.Cart.DoesNotExist:
             return HttpResponseNotFound()
         current_cart.order_created = True
+        current_cart.owner = None
         current_cart.save()
         new_order = models.Order.objects.create(owner=request.user, cart=current_cart)
         return new_order

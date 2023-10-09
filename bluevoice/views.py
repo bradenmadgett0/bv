@@ -40,9 +40,10 @@ class OrderViewSet(viewsets.ModelViewSet):
 
     def list(self, request):
         try:
-            order = models.Order.objects.get(owner=request.user.id)
+            orders = models.Order.objects.filter(owner=request.user.id)
+            print(orders)
         except models.Order.DoesNotExist:
             return HttpResponseNotFound()
-        serializer = serializers.OrderSerializer(order, many=False)
+        serializer = serializers.OrderSerializer(orders, many=True)
         return Response(serializer.data)
     
