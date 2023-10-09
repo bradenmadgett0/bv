@@ -32,3 +32,17 @@ class CartViewSet(viewsets.ModelViewSet):
             return HttpResponseNotFound()
         serializer = serializers.CartSerializer(cart, many=False)
         return Response(serializer.data)
+    
+class OrderViewSet(viewsets.ModelViewSet):
+    queryset = models.Order.objects.all()
+    serializer_class = serializers.OrderSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def list(self, request):
+        try:
+            order = models.Order.objects.get(owner=request.user.id)
+        except models.Order.DoesNotExist:
+            return HttpResponseNotFound()
+        serializer = serializers.OrderSerializer(order, many=False)
+        return Response(serializer.data)
+    

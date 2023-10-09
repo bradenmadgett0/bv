@@ -5,22 +5,9 @@ from rest_framework.response import Response
 from . import models 
 
 class MenuItemSerializer(serializers.ModelSerializer):
-    quantity = serializers.SerializerMethodField()
     class Meta:
         model = models.MenuItem
-        fields = ['title', 'description', 'price', 'id', 'quantity']
-
-    def get_quantity(self, obj):
-        request = self.context['request']
-        try:
-            cart = request.user.cart
-        except:
-            return None
-        cart_item = obj.cartitem_set.filter(cart=cart).first()
-        if cart_item:
-            return cart_item.quantity
-        else:
-            return None
+        fields = ['title', 'description', 'price', 'id']
 
     def create(self, validated_data):
          return models.MenuItem.objects.create(**validated_data)
@@ -33,15 +20,16 @@ class MenuItemSerializer(serializers.ModelSerializer):
         return instance
     
 class CartItemSerializer(serializers.ModelSerializer):
+    item = MenuItemSerializer(many=False, read_only=True)
     class Meta:
         model = models.CartItem
-        fields = ['title', 'quantity', 'item']
+        fields = ['cart', 'quantity', 'item', 'id']
 
 class CartSerializer(serializers.ModelSerializer):
-    items = MenuItemSerializer(many = True, read_only=True)
+    cart_items = CartItemSerializer(many=True, read_only=True)
     class Meta:
         model = models.Cart
-        fields = ['items', 'id', 'owner', 'total']
+        fields = ['cart_items', 'id', 'owner', 'total']
 
     def create(self, validated_data):
         request = self.context.get('request', None)
@@ -61,14 +49,13 @@ class CartSerializer(serializers.ModelSerializer):
                 cart_item.quantity = cart_item.quantity + 1
                 cart_item.save()
             except models.CartItem.DoesNotExist:
-                cart.items.add(item_to_add)
+                models.CartItem.objects.create(cart=cart, item=item_to_add, quantity=1)
             cart.total = cart.total + item_to_add.price
             cart.save()
             return cart
         except models.Cart.DoesNotExist:
             new_cart = models.Cart.objects.create(owner=request.user)
-            item_to_add.count = 1
-            new_cart.items.add(item_to_add)
+            models.CartItem.objects.create(cart=new_cart, item=item_to_add, quantity=1)
             new_cart.total = item_to_add.price
             new_cart.save()
             return new_cart
@@ -103,3 +90,20 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['username', 'email', 'id', 'cart']
+
+class OrderSerializer(serializers.ModelSerializer):
+    # cart = MenuItemSerializer(many = True, read_only=True)
+    class Meta:
+        model = models.Order
+        fields = ['owner', 'cart']
+    
+    def create(self, validated_data):
+        request = self.context.get('request', None)
+        try:
+            current_cart = models.Cart.objects.get(owner=request.user)
+        except models.Cart.DoesNotExist:
+            return HttpResponseNotFound()
+        current_cart.order_created = True
+        current_cart.save()
+        new_order = models.Order.objects.create(owner=request.user, cart=current_cart)
+        return new_order

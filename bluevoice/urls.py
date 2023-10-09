@@ -53,10 +53,23 @@ user_detail = views.UserViewSet.as_view({
     'get': 'retrieve'
 })
 
+order_list = views.OrderViewSet.as_view({
+    'get': 'list',
+    'post': 'create'
+})
+
+order_detail = views.OrderViewSet.as_view({
+    'get': 'retrieve',
+    'put': 'update',
+    'patch': 'partial_update',
+    'delete': 'destroy'
+})
+
 router = DefaultRouter()
 router.register(r'users', views.UserViewSet)
 router.register(r'api/menu', views.MenuItemsViewSet)
 router.register(r'api/cart', views.CartViewSet)
+router.register(r'api/orders', views.OrderViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
