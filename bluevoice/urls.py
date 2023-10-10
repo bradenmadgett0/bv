@@ -73,7 +73,8 @@ router.register(r'api/orders', views.OrderViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
-    path('api/login/', views.BasicAuthLogin.as_view())
+    path('api/login/', views.BasicAuthLogin.as_view()),
+    path('api/logout/', views.BasicAuthLogin.as_view())
 ]
 
 urlpatterns += [
