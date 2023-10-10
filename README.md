@@ -1,10 +1,13 @@
 To run this project:
 
 Install Python and Django
+
 Open project root
+
 Run python manage.py runserver
 
 Project should come populated with a test user and some orders.
+
 
 If you delete the DB and migrations and start fresh, you can get back to a testable state by doing the following:
 
