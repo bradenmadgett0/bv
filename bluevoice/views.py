@@ -4,6 +4,9 @@ from rest_framework import viewsets, permissions, serializers as rest_serializer
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
+from rest_framework.views import APIView
+from django.views.decorators.csrf import csrf_exempt
+
 
 from . import serializers
 from . import models
@@ -47,3 +50,16 @@ class OrderViewSet(viewsets.ModelViewSet):
         serializer = serializers.OrderSerializer(orders, many=True)
         return Response(serializer.data)
     
+
+class BasicAuthLogin(APIView):
+    def post(self, request, *args, **kwargs):
+        return Response()
+    
+class DisableCSRFMiddleware(object):
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        setattr(request, '_dont_enforce_csrf_checks', True)
+        response = self.get_response(request)
+        return response
